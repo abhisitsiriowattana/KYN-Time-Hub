@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KYN Time – Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --orange:#ff7a1a; --gray-900:#0f172a; --gray-700:#334155; --gray-500:#64748b; --gray-200:#e5e7eb; --success:#10b981; --error:#ef4444;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family: "Inter","Prompt",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
+      margin:0; background:linear-gradient(180deg,#0b1220 0%,#111827 100%);
+      min-height:100dvh; display:grid; place-items:center; color:#e5e7eb;
+    }
+    .card{
+      width:min(720px,92vw); background:#0f172a; border:1px solid #1f2937; border-radius:var(--radius);
+      box-shadow:0 10px 40px rgba(0,0,0,.45); overflow:hidden;
+    }
+    .header{
+      padding:28px 28px 18px; display:flex; align-items:center; gap:14px; border-bottom:1px solid #1f2937;
+      background:
+        radial-gradient(1200px 300px at 10% -20%, rgba(255,122,26,.25), transparent 60%),
+        radial-gradient(800px 260px at 110% -40%, rgba(255,122,26,.18), transparent 60%);
+    }
+    .logo{
+      width:46px; height:46px; border-radius:12px; background:conic-gradient(from 240deg at 50% 50%, #ffaf70, #ff7a1a, #ffaf70);
+      display:grid; place-items:center; font-weight:800; color:#111827; letter-spacing:.5px;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.2);
+    }
+    .title{margin:0; font-size:22px; font-weight:800}
+    .subtitle{margin:2px 0 0; font-size:13px; color:#94a3b8}
+    .body{padding:22px 28px 26px; display:grid; gap:18px}
+    .notice{
+      background:#0b1220; border:1px dashed #273244; border-radius:12px; padding:14px 16px; color:#a3b2c7; font-size:13px; line-height:1.45;
+    }
+    .grid{display:grid; gap:14px}
+    .grid.two{grid-template-columns:1fr 1fr}
+    label{display:block; font-size:13px; color:#cbd5e1; margin:0 0 6px}
+    input{
+      width:100%; background:#0b1220; border:1px solid #253148; color:#e9eef7; padding:12px 12px; border-radius:12px; outline:none;
+    }
+    input::placeholder{color:#62708a}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:700; cursor:pointer;
+      display:inline-flex; align-items:center; gap:10px;
+    }
+    .btn-primary{background:var(--orange); color:#111827}
+    .btn-muted{background:#111827; color:#e5e7eb; border:1px solid #263144}
+    .btn-ghost{background:transparent; border:1px solid #263144; color:#cbd5e1}
+    .hint{font-size:12px; color:#9fb0c8}
+    .alert{padding:12px 14px; border-radius:12px; font-size:14px}
+    .alert.success{background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.35); color:#c7f7df}
+    .alert.error{background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35); color:#ffd7d7}
+    .footer{padding:14px 28px 20px; border-top:1px solid #1f2937; color:#8ea4bf; font-size:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px}
+    .tag{padding:4px 10px; border-radius:999px; border:1px solid #273244; background:#0b1220; font-size:12px; color:#93a0b8}
+    .divider{height:1px; background:#1f2937; margin:4px 0}
+    .or{display:flex; align-items:center; gap:10px; color:#6b7d98; font-size:12px}
+    .or:before,.or:after{content:""; height:1px; background:#1f2937; flex:1}
+    .hidden{display:none !important}
+  </style>
+  <!-- LINE LIFF SDK (ใช้ได้เมื่อเปิดโหมด LINE Login) -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="logo">KYN</div>
+      <div>
+        <h1 class="title">KYN Time – Login</h1>
+        <p class="subtitle">เข้าสู่ระบบครั้งเดียว เพื่อใช้งานบันทึกเวลาเข้า–ออกงาน</p>
+      </div>
+    </div>
+
+    <div class="body">
+      <div id="alertBox" class="alert hidden"></div>
+
+      <div class="notice">
+        ✅ ระบบนี้รองรับทั้ง <b>LINE Login (LIFF)</b> และ <b>ลงทะเบียนด้วยฟอร์ม</b>  
+        – เมื่อเข้าสู่ระบบสำเร็จ ข้อมูลจะถูกบันทึกใน <b>Sheet: Employees</b> และคุณจะถูกนำไปยังหน้าใช้งานทันที
+      </div>
+
+      <!-- ปุ่ม LINE Login -->
+      <div id="lineLoginBlock">
+        <div class="row">
+          <button id="btnLineLogin" class="btn btn-primary">
+            <span>เข้าสู่ระบบด้วย LINE</span>
+          </button>
+          <button id="btnUseForm" class="btn btn-ghost">หรือ ลงทะเบียนด้วยฟอร์ม</button>
+        </div>
+        <div class="hint">แนะนำ: ใช้ LINE เพื่อผูกบัญชีอัตโนมัติ (ได้ LineUserId)</div>
+        <div class="divider"></div>
+      </div>
+
+      <div class="or hidden" id="orSep">หรือ</div>
+
+      <!-- ฟอร์มลงทะเบียนครั้งแรก -->
+      <form id="registerForm" class="grid hidden" autocomplete="on" novalidate>
+        <div class="grid two">
+          <div>
+            <label>Employee ID *</label>
+            <input id="fEmployeeId" placeholder="เช่น E001" required />
+          </div>
+          <div>
+            <label>ชื่อ–สกุล *</label>
+            <input id="fName" placeholder="เช่น สมชาย ใจดี" required />
+          </div>
+        </div>
+        <div class="grid two">
+          <div>
+            <label>แผนก</label>
+            <input id="fDept" placeholder="เช่น HR / Finance / Operation" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input id="fEmail" type="email" placeholder="name@company.com" />
+          </div>
+        </div>
+        <div>
+          <label>User ID (จะถูกกรอกอัตโนมัติถ้าใช้ LINE)</label>
+          <input id="fUserId" placeholder="เช่น LIFF userId หรือ UUID" />
+        </div>
+
+        <div class="row">
+          <button type="submit" class="btn btn-primary">ลงทะเบียน / เข้าสู่ระบบ</button>
+          <button type="button" id="btnBack" class="btn btn-muted">ย้อนกลับ</button>
+        </div>
+        <div class="hint">* ต้องกรอกให้ครบ</div>
+      </form>
+
+    </div>
+
+    <div class="footer">
+      <div class="tag">Secure • HTTPS • CORS</div>
+      <div>© KYN Time Hub</div>
+    </div>
+  </div>
+
+  <script>
+    // ================== CONFIG ==================
+    // TODO(1): ใส่ URL ของ Apps Script Web App ของคุณ
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxCy7ExGaKLpPShFB_BcuZqqpbO0rpuUcAjKnHu0-LsFG-lahdtCmziKTmQMvf0TEN1Cg/exec';
+
+    // TODO(2): ถ้าใช้ LINE Login ให้ใส่ LIFF_ID (ถ้าไม่ใช้ ปล่อยว่าง '')
+    const LIFF_ID = ''; // เช่น '2000000000-xxxxxzy'
+
+    // เมื่อ login สำเร็จให้ไปหน้านี้
+    const REDIRECT_AFTER_LOGIN = 'index.html'; // เปลี่ยนได้ตามโครงโปรเจคของคุณ
+
+    // ================ UTILITIES ================
+    const alertBox = document.getElementById('alertBox');
+    function showAlert(type, msg){
+      alertBox.className = 'alert ' + (type === 'error' ? 'error' : 'success');
+      alertBox.textContent = msg;
+      alertBox.classList.remove('hidden');
+      setTimeout(()=>alertBox.classList.add('hidden'), 3500);
+    }
+
+    function saveSession({ userId, name, employeeId }){
+      if (userId) localStorage.setItem('userId', userId);
+      if (name) localStorage.setItem('name', name);
+      if (employeeId) localStorage.setItem('employeeId', employeeId);
+    }
+
+    async function apiGet(params){
+      const q = new URLSearchParams(params).toString();
+      const res = await fetch(`${API_URL}?${q}`);
+      return res.json();
+    }
+    async function apiPost(body){
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      return res.json();
+    }
+
+    // ================== LINE (LIFF) ==================
+    let lineProfile = null;
+
+    async function initLIFFIfNeeded(){
+      if (!LIFF_ID) return false;
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()){
+        // เรียก login LINE
+        liff.login();
+        return true;
+      } else {
+        const prof = await liff.getProfile();
+        lineProfile = {
+          userId: prof.userId,
+          name: prof.displayName
+        };
+        return true;
+      }
+    }
+
+    // ================== FLOWS ==================
+    async function tryFastContinue(){
+      const userId = localStorage.getItem('userId');
+      if (!userId) return false;
+      // ตรวจสถานะลงทะเบียน
+      try{
+        const st = await apiGet({ action:'status', userId });
+        if (st.registered){
+          // มีสิทธิ์แล้ว -> ไปหน้าใช้งาน
+          location.href = REDIRECT_AFTER_LOGIN;
+          return true;
+        }
+      }catch(e){ /* ignore */ }
+      return false;
+    }
+
+    async function registerOrLogin({userId, name, employeeId, department, email}){
+      // call Apps Script register
+      const json = await apiPost({
+        action: 'register',
+        userId, name, employeeId, department, email
+      });
+      if (!json.ok) throw new Error(json.error || 'Register failed');
+      saveSession({ userId, name, employeeId });
+      showAlert('success', 'เข้าสู่ระบบสำเร็จ กำลังนำคุณไปยังหน้าหลัก...');
+      setTimeout(()=> location.href = REDIRECT_AFTER_LOGIN, 900);
+    }
+
+    // ================ UI HANDLERS ================
+    const lineLoginBlock = document.getElementById('lineLoginBlock');
+    const orSep = document.getElementById('orSep');
+    const form = document.getElementById('registerForm');
+
+    const btnLineLogin = document.getElementById('btnLineLogin');
+    const btnUseForm = document.getElementById('btnUseForm');
+    const btnBack = document.getElementById('btnBack');
+
+    const fEmployeeId = document.getElementById('fEmployeeId');
+    const fName = document.getElementById('fName');
+    const fDept = document.getElementById('fDept');
+    const fEmail = document.getElementById('fEmail');
+    const fUserId = document.getElementById('fUserId');
+
+    btnUseForm.addEventListener('click', ()=>{
+      lineLoginBlock.classList.add('hidden');
+      orSep.classList.add('hidden');
+      form.classList.remove('hidden');
+    });
+    btnBack.addEventListener('click', ()=>{
+      form.classList.add('hidden');
+      lineLoginBlock.classList.remove('hidden');
+      orSep.classList.add('hidden');
+    });
+
+    btnLineLogin.addEventListener('click', async ()=>{
+      if (!LIFF_ID){
+        showAlert('error','ยังไม่ได้ตั้งค่า LIFF_ID');
+        return;
+      }
+      try{
+        await initLIFFIfNeeded();
+        if (!lineProfile){
+          // หลัง liff.login() จะ reload กลับมาอีกครั้ง แล้ว init ได้ profile
+          return;
+        }
+        // มีโปรไฟล์แล้ว -> เช็คสถานะ
+        const st = await apiGet({ action:'status', userId: lineProfile.userId });
+        if (st.registered){
+          saveSession({ userId: lineProfile.userId, name: lineProfile.name, employeeId: st.employee?.EmployeeID || '' });
+          location.href = REDIRECT_AFTER_LOGIN;
+          return;
+        }
+        // ยังไม่ลงทะเบียน -> เปิดฟอร์ม โดยเติมค่าให้
+        lineLoginBlock.classList.add('hidden');
+        form.classList.remove('hidden');
+        fUserId.value = lineProfile.userId;
+        fName.value = lineProfile.name;
+        showAlert('success','พบบัญชี LINE แล้ว กรุณากรอก Employee ID เพื่อผูกบัญชี');
+      }catch(err){
+        showAlert('error', String(err));
+      }
+    });
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const employeeId = fEmployeeId.value.trim();
+      const name = fName.value.trim();
+      const department = fDept.value.trim();
+      const email = fEmail.value.trim();
+      const userId = (fUserId.value.trim() || (lineProfile?.userId || ''));
+
+      if (!employeeId || !name){
+        showAlert('error','กรอก Employee ID และ ชื่อ–สกุล ให้ครบ');
+        return;
+      }
+      if (!userId){
+        // ถ้าไม่ใช้ LIFF ให้สร้าง UUID ชั่วคราวเป็น userId
+        const uuid = crypto.randomUUID ? crypto.randomUUID() : ('uuid-' + Date.now());
+        fUserId.value = uuid;
+      }
+
+      try{
+        await registerOrLogin({
+          userId: fUserId.value.trim(),
+          name, employeeId, department, email
+        });
+      }catch(err){
+        showAlert('error', String(err));
+      }
+    });
+
+    // ================ INIT ================
+    (async function init(){
+      // 1) ถ้าเคยล็อกอินไว้แล้ว ลอง continue
+      const continued = await tryFastContinue();
+      if (continued) return;
+
+      // 2) ถ้ามี LIFF_ID -> แสดงปุ่ม LINE Login (ค่า default)
+      if (LIFF_ID){
+        lineLoginBlock.classList.remove('hidden');
+        orSep.classList.remove('hidden');
+      } else {
+        // ถ้าไม่ใช้ LIFF -> เปิดฟอร์มทันที
+        lineLoginBlock.classList.add('hidden');
+        orSep.classList.add('hidden');
+        form.classList.remove('hidden');
+      }
+    })();
+  </script>
+</body>
+</html>
