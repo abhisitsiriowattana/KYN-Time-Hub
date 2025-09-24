@@ -4,330 +4,247 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>KYN Time – Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    :root{
-      --orange:#ff7a1a; --gray-900:#0f172a; --gray-700:#334155; --gray-500:#64748b; --gray-200:#e5e7eb; --success:#10b981; --error:#ef4444;
-      --radius:16px;
-    }
+    :root{ --orange:#ff7a1a; --bg:#0b1220; --card:#0f172a; --line:#1f2937; --muted:#93a0b8; --err:#ef4444; --ok:#10b981; --radius:16px; }
     *{box-sizing:border-box}
     body{
-      font-family: "Inter","Prompt",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
-      margin:0; background:linear-gradient(180deg,#0b1220 0%,#111827 100%);
-      min-height:100dvh; display:grid; place-items:center; color:#e5e7eb;
-    }
-    .card{
-      width:min(720px,92vw); background:#0f172a; border:1px solid #1f2937; border-radius:var(--radius);
-      box-shadow:0 10px 40px rgba(0,0,0,.45); overflow:hidden;
-    }
-    .header{
-      padding:28px 28px 18px; display:flex; align-items:center; gap:14px; border-bottom:1px solid #1f2937;
+      margin:0; min-height:100dvh; display:grid; place-items:center;
       background:
-        radial-gradient(1200px 300px at 10% -20%, rgba(255,122,26,.25), transparent 60%),
-        radial-gradient(800px 260px at 110% -40%, rgba(255,122,26,.18), transparent 60%);
+        radial-gradient(900px 320px at 110% -15%, rgba(255,122,26,.18), transparent 60%),
+        linear-gradient(180deg,#0b1220,#111827);
+      color:#e5e7eb;
+      font-family:"Inter","Prompt",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
     }
-    .logo{
-      width:46px; height:46px; border-radius:12px; background:conic-gradient(from 240deg at 50% 50%, #ffaf70, #ff7a1a, #ffaf70);
-      display:grid; place-items:center; font-weight:800; color:#111827; letter-spacing:.5px;
-      box-shadow:inset 0 0 0 2px rgba(255,255,255,.2);
-    }
+    .card{width:min(720px,92vw); background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 12px 40px rgba(0,0,0,.45); overflow:hidden}
+    .head{padding:26px 28px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center}
+    .logo{width:44px;height:44px;border-radius:12px;background:conic-gradient(from 240deg,#ffaf70,#ff7a1a,#ffaf70); display:grid; place-items:center; color:#111827; font-weight:800}
     .title{margin:0; font-size:22px; font-weight:800}
-    .subtitle{margin:2px 0 0; font-size:13px; color:#94a3b8}
-    .body{padding:22px 28px 26px; display:grid; gap:18px}
-    .notice{
-      background:#0b1220; border:1px dashed #273244; border-radius:12px; padding:14px 16px; color:#a3b2c7; font-size:13px; line-height:1.45;
-    }
-    .grid{display:grid; gap:14px}
-    .grid.two{grid-template-columns:1fr 1fr}
-    label{display:block; font-size:13px; color:#cbd5e1; margin:0 0 6px}
-    input{
-      width:100%; background:#0b1220; border:1px solid #253148; color:#e9eef7; padding:12px 12px; border-radius:12px; outline:none;
-    }
-    input::placeholder{color:#62708a}
-    .row{display:flex; gap:12px; flex-wrap:wrap}
-    .btn{
-      appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:700; cursor:pointer;
-      display:inline-flex; align-items:center; gap:10px;
-    }
+    .sub{margin:2px 0 0; color:#9fb0c8; font-size:13px}
+    .body{padding:20px 28px 22px; display:grid; gap:16px}
+    label{font-size:13px; color:#cbd5e1; display:block; margin:0 0 6px}
+    input{width:100%; padding:12px 12px; border-radius:12px; border:1px solid #233045; background:#0b1220; color:#e9eef7; outline:none}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:10px}
     .btn-primary{background:var(--orange); color:#111827}
-    .btn-muted{background:#111827; color:#e5e7eb; border:1px solid #263144}
     .btn-ghost{background:transparent; border:1px solid #263144; color:#cbd5e1}
-    .hint{font-size:12px; color:#9fb0c8}
-    .alert{padding:12px 14px; border-radius:12px; font-size:14px}
-    .alert.success{background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.35); color:#c7f7df}
+    .alert{padding:12px 14px; border-radius:12px; font-size:14px; display:none}
     .alert.error{background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35); color:#ffd7d7}
-    .footer{padding:14px 28px 20px; border-top:1px solid #1f2937; color:#8ea4bf; font-size:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px}
-    .tag{padding:4px 10px; border-radius:999px; border:1px solid #273244; background:#0b1220; font-size:12px; color:#93a0b8}
-    .divider{height:1px; background:#1f2937; margin:4px 0}
-    .or{display:flex; align-items:center; gap:10px; color:#6b7d98; font-size:12px}
-    .or:before,.or:after{content:""; height:1px; background:#1f2937; flex:1}
-    .hidden{display:none !important}
+    .alert.success{background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.35); color:#c7f7df}
+    .hint{font-size:12px; color:#9fb0c8}
+    .foot{padding:14px 28px 18px; border-top:1px solid var(--line); color:#8ea4bf; font-size:12px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap}
+
+    /* Modal เปลี่ยนรหัสผ่าน */
+    .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; place-items:center; padding:16px; z-index:50}
+    .modal{width:min(520px,92vw); background:#0f172a; border:1px solid #263144; border-radius:16px; padding:18px; color:#e5e7eb}
+    .modal h3{margin:0 0 8px; font-size:18px}
+    .meter{height:6px; border-radius:999px; background:#1f2937; overflow:hidden}
+    .meter>div{height:100%; background:#10b981; width:0%}
   </style>
-  <!-- LINE LIFF SDK (ใช้ได้เมื่อเปิดโหมด LINE Login) -->
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
   <div class="card">
-    <div class="header">
+    <div class="head">
       <div class="logo">KYN</div>
       <div>
-        <h1 class="title">KYN Time – Login</h1>
-        <p class="subtitle">เข้าสู่ระบบครั้งเดียว เพื่อใช้งานบันทึกเวลาเข้า–ออกงาน</p>
+        <div class="title">KYN Time – Login</div>
+        <div class="sub">เข้าสู่ระบบด้วย Username/Password และผูก LINE เครื่องปัจจุบัน</div>
       </div>
     </div>
 
     <div class="body">
-      <div id="alertBox" class="alert hidden"></div>
+      <div id="alert" class="alert"></div>
 
-      <div class="notice">
-        ✅ ระบบนี้รองรับทั้ง <b>LINE Login (LIFF)</b> และ <b>ลงทะเบียนด้วยฟอร์ม</b>  
-        – เมื่อเข้าสู่ระบบสำเร็จ ข้อมูลจะถูกบันทึกใน <b>Sheet: Employees</b> และคุณจะถูกนำไปยังหน้าใช้งานทันที
+      <div class="hint" id="liffStatus">กำลังตรวจสอบ LINE (เพื่อผูกอุปกรณ์)...</div>
+
+      <div>
+        <label>Username</label>
+        <input id="username" autocomplete="username" placeholder="เช่น e001" />
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
       </div>
 
-      <!-- ปุ่ม LINE Login -->
-      <div id="lineLoginBlock">
-        <div class="row">
-          <button id="btnLineLogin" class="btn btn-primary">
-            <span>เข้าสู่ระบบด้วย LINE</span>
-          </button>
-          <button id="btnUseForm" class="btn btn-ghost">หรือ ลงทะเบียนด้วยฟอร์ม</button>
-        </div>
-        <div class="hint">แนะนำ: ใช้ LINE เพื่อผูกบัญชีอัตโนมัติ (ได้ LineUserId)</div>
-        <div class="divider"></div>
+      <div class="row">
+        <button id="btnLogin" class="btn btn-primary">เข้าสู่ระบบ</button>
+        <button id="btnReloadLine" class="btn btn-ghost">เปิดผ่าน LINE อีกครั้ง</button>
       </div>
 
-      <div class="or hidden" id="orSep">หรือ</div>
-
-      <!-- ฟอร์มลงทะเบียนครั้งแรก -->
-      <form id="registerForm" class="grid hidden" autocomplete="on" novalidate>
-        <div class="grid two">
-          <div>
-            <label>Employee ID *</label>
-            <input id="fEmployeeId" placeholder="เช่น E001" required />
-          </div>
-          <div>
-            <label>ชื่อ–สกุล *</label>
-            <input id="fName" placeholder="เช่น สมชาย ใจดี" required />
-          </div>
-        </div>
-        <div class="grid two">
-          <div>
-            <label>แผนก</label>
-            <input id="fDept" placeholder="เช่น HR / Finance / Operation" />
-          </div>
-          <div>
-            <label>Email</label>
-            <input id="fEmail" type="email" placeholder="name@company.com" />
-          </div>
-        </div>
-        <div>
-          <label>User ID (จะถูกกรอกอัตโนมัติถ้าใช้ LINE)</label>
-          <input id="fUserId" placeholder="เช่น LIFF userId หรือ UUID" />
-        </div>
-
-        <div class="row">
-          <button type="submit" class="btn btn-primary">ลงทะเบียน / เข้าสู่ระบบ</button>
-          <button type="button" id="btnBack" class="btn btn-muted">ย้อนกลับ</button>
-        </div>
-        <div class="hint">* ต้องกรอกให้ครบ</div>
-      </form>
-
+      <div class="hint">หมายเหตุ: ต้องเปิดหน้านี้ผ่าน LINE (LIFF) เพื่อผูกบัญชีเข้ากับเครื่อง</div>
     </div>
 
-    <div class="footer">
-      <div class="tag">Secure • HTTPS • CORS</div>
+    <div class="foot">
       <div>© KYN Time Hub</div>
+      <div>Secure • SHA-256 • Device Binding</div>
+    </div>
+  </div>
+
+  <!-- Modal: บังคับเปลี่ยนรหัสผ่านครั้งแรก -->
+  <div id="pwModal" class="backdrop">
+    <div class="modal">
+      <h3>เปลี่ยนรหัสผ่านครั้งแรก</h3>
+      <p class="hint" style="margin:-2px 0 10px">ตั้งรหัสอย่างน้อย 8 ตัวอักษร และมี ตัวพิมพ์ใหญ่/เล็ก และตัวเลข</p>
+      <div>
+        <label>รหัสผ่านปัจจุบัน</label>
+        <input id="curPw" type="password" placeholder="••••••••" />
+      </div>
+      <div>
+        <label>รหัสผ่านใหม่</label>
+        <input id="newPw" type="password" placeholder="อย่างน้อย 8 ตัวอักษร" />
+        <div class="meter" style="margin-top:8px"><div id="pwStrength"></div></div>
+      </div>
+      <div>
+        <label>ยืนยันรหัสผ่านใหม่</label>
+        <input id="newPw2" type="password" placeholder="พิมพ์ซ้ำอีกครั้ง" />
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button id="btnChangePw" class="btn btn-primary">บันทึกรหัสผ่านใหม่</button>
+        <button id="btnCancelPw" class="btn btn-ghost">ยกเลิก</button>
+      </div>
+      <div id="pwMsg" class="hint" style="margin-top:8px"></div>
     </div>
   </div>
 
   <script>
-    // ================== CONFIG ==================
-    // TODO(1): ใส่ URL ของ Apps Script Web App ของคุณ
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxCy7ExGaKLpPShFB_BcuZqqpbO0rpuUcAjKnHu0-LsFG-lahdtCmziKTmQMvf0TEN1Cg/exec';
+    /******** CONFIG (แก้ให้ตรงระบบคุณ) ********/
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxCy7ExGaKLpPShFB_BcuZqqpbO0rpuUcAjKnHu0-LsFG-lahdtCmziKTmQMvf0TEN1Cg/exec'; // TODO: Apps Script Web App URL
+    const LIFF_ID = '2007896777-Gq1RQ1oE'; // TODO: LIFF ID ของ LINE App
+    const params = new URLSearchParams(location.search);
+    const REDIRECT_AFTER_LOGIN = params.get('redirect') || 'index.html';
 
-    // TODO(2): ถ้าใช้ LINE Login ให้ใส่ LIFF_ID (ถ้าไม่ใช้ ปล่อยว่าง '')
-    const LIFF_ID = ''; // เช่น '2000000000-xxxxxzy'
+    /******** STATE ********/
+    let lineUserId = '';
 
-    // เมื่อ login สำเร็จให้ไปหน้านี้
-    const REDIRECT_AFTER_LOGIN = 'index.html'; // เปลี่ยนได้ตามโครงโปรเจคของคุณ
-
-    // ================ UTILITIES ================
-    const alertBox = document.getElementById('alertBox');
-    function showAlert(type, msg){
+    /******** UI ********/
+    const $ = (s)=>document.querySelector(s);
+    const alertBox = $('#alert');
+    function notify(type, text){
       alertBox.className = 'alert ' + (type === 'error' ? 'error' : 'success');
-      alertBox.textContent = msg;
-      alertBox.classList.remove('hidden');
-      setTimeout(()=>alertBox.classList.add('hidden'), 3500);
+      alertBox.textContent = text;
+      alertBox.style.display = 'block';
+      setTimeout(()=>alertBox.style.display='none', 3500);
     }
 
-    function saveSession({ userId, name, employeeId }){
-      if (userId) localStorage.setItem('userId', userId);
-      if (name) localStorage.setItem('name', name);
-      if (employeeId) localStorage.setItem('employeeId', employeeId);
-    }
-
-    async function apiGet(params){
-      const q = new URLSearchParams(params).toString();
-      const res = await fetch(`${API_URL}?${q}`);
-      return res.json();
-    }
-    async function apiPost(body){
-      const res = await fetch(API_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(body)
-      });
-      return res.json();
-    }
-
-    // ================== LINE (LIFF) ==================
-    let lineProfile = null;
-
-    async function initLIFFIfNeeded(){
-      if (!LIFF_ID) return false;
-      await liff.init({ liffId: LIFF_ID });
-      if (!liff.isLoggedIn()){
-        // เรียก login LINE
-        liff.login();
-        return true;
-      } else {
+    /******** LIFF ********/
+    async function initLIFF(){
+      try{
+        $('#liffStatus').textContent = 'กำลังเริ่มต้น LIFF...';
+        await liff.init({ liffId: LIFF_ID });
+        if (!liff.isLoggedIn()){
+          $('#liffStatus').textContent = 'ยังไม่ได้ล็อกอิน LINE – กด "เปิดผ่าน LINE อีกครั้ง"';
+          return false;
+        }
         const prof = await liff.getProfile();
-        lineProfile = {
-          userId: prof.userId,
-          name: prof.displayName
-        };
+        lineUserId = prof.userId;
+        $('#liffStatus').textContent = 'ตรวจสอบ LINE สำเร็จ (พร้อมผูกอุปกรณ์)';
         return true;
+      }catch(err){
+        $('#liffStatus').textContent = 'ไม่สามารถเริ่ม LIFF ได้: ' + err;
+        return false;
       }
     }
 
-    // ================== FLOWS ==================
-    async function tryFastContinue(){
+    /******** FAST CONTINUE: ข้ามหน้าถ้ามี session แล้ว ********/
+    (function fastContinue(){
+      const employeeId = localStorage.getItem('employeeId');
       const userId = localStorage.getItem('userId');
-      if (!userId) return false;
-      // ตรวจสถานะลงทะเบียน
-      try{
-        const st = await apiGet({ action:'status', userId });
-        if (st.registered){
-          // มีสิทธิ์แล้ว -> ไปหน้าใช้งาน
-          location.href = REDIRECT_AFTER_LOGIN;
-          return true;
-        }
-      }catch(e){ /* ignore */ }
-      return false;
-    }
-
-    async function registerOrLogin({userId, name, employeeId, department, email}){
-      // call Apps Script register
-      const json = await apiPost({
-        action: 'register',
-        userId, name, employeeId, department, email
-      });
-      if (!json.ok) throw new Error(json.error || 'Register failed');
-      saveSession({ userId, name, employeeId });
-      showAlert('success', 'เข้าสู่ระบบสำเร็จ กำลังนำคุณไปยังหน้าหลัก...');
-      setTimeout(()=> location.href = REDIRECT_AFTER_LOGIN, 900);
-    }
-
-    // ================ UI HANDLERS ================
-    const lineLoginBlock = document.getElementById('lineLoginBlock');
-    const orSep = document.getElementById('orSep');
-    const form = document.getElementById('registerForm');
-
-    const btnLineLogin = document.getElementById('btnLineLogin');
-    const btnUseForm = document.getElementById('btnUseForm');
-    const btnBack = document.getElementById('btnBack');
-
-    const fEmployeeId = document.getElementById('fEmployeeId');
-    const fName = document.getElementById('fName');
-    const fDept = document.getElementById('fDept');
-    const fEmail = document.getElementById('fEmail');
-    const fUserId = document.getElementById('fUserId');
-
-    btnUseForm.addEventListener('click', ()=>{
-      lineLoginBlock.classList.add('hidden');
-      orSep.classList.add('hidden');
-      form.classList.remove('hidden');
-    });
-    btnBack.addEventListener('click', ()=>{
-      form.classList.add('hidden');
-      lineLoginBlock.classList.remove('hidden');
-      orSep.classList.add('hidden');
-    });
-
-    btnLineLogin.addEventListener('click', async ()=>{
-      if (!LIFF_ID){
-        showAlert('error','ยังไม่ได้ตั้งค่า LIFF_ID');
-        return;
-      }
-      try{
-        await initLIFFIfNeeded();
-        if (!lineProfile){
-          // หลัง liff.login() จะ reload กลับมาอีกครั้ง แล้ว init ได้ profile
-          return;
-        }
-        // มีโปรไฟล์แล้ว -> เช็คสถานะ
-        const st = await apiGet({ action:'status', userId: lineProfile.userId });
-        if (st.registered){
-          saveSession({ userId: lineProfile.userId, name: lineProfile.name, employeeId: st.employee?.EmployeeID || '' });
-          location.href = REDIRECT_AFTER_LOGIN;
-          return;
-        }
-        // ยังไม่ลงทะเบียน -> เปิดฟอร์ม โดยเติมค่าให้
-        lineLoginBlock.classList.add('hidden');
-        form.classList.remove('hidden');
-        fUserId.value = lineProfile.userId;
-        fName.value = lineProfile.name;
-        showAlert('success','พบบัญชี LINE แล้ว กรุณากรอก Employee ID เพื่อผูกบัญชี');
-      }catch(err){
-        showAlert('error', String(err));
-      }
-    });
-
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const employeeId = fEmployeeId.value.trim();
-      const name = fName.value.trim();
-      const department = fDept.value.trim();
-      const email = fEmail.value.trim();
-      const userId = (fUserId.value.trim() || (lineProfile?.userId || ''));
-
-      if (!employeeId || !name){
-        showAlert('error','กรอก Employee ID และ ชื่อ–สกุล ให้ครบ');
-        return;
-      }
-      if (!userId){
-        // ถ้าไม่ใช้ LIFF ให้สร้าง UUID ชั่วคราวเป็น userId
-        const uuid = crypto.randomUUID ? crypto.randomUUID() : ('uuid-' + Date.now());
-        fUserId.value = uuid;
-      }
-
-      try{
-        await registerOrLogin({
-          userId: fUserId.value.trim(),
-          name, employeeId, department, email
-        });
-      }catch(err){
-        showAlert('error', String(err));
-      }
-    });
-
-    // ================ INIT ================
-    (async function init(){
-      // 1) ถ้าเคยล็อกอินไว้แล้ว ลอง continue
-      const continued = await tryFastContinue();
-      if (continued) return;
-
-      // 2) ถ้ามี LIFF_ID -> แสดงปุ่ม LINE Login (ค่า default)
-      if (LIFF_ID){
-        lineLoginBlock.classList.remove('hidden');
-        orSep.classList.remove('hidden');
-      } else {
-        // ถ้าไม่ใช้ LIFF -> เปิดฟอร์มทันที
-        lineLoginBlock.classList.add('hidden');
-        orSep.classList.add('hidden');
-        form.classList.remove('hidden');
+      if (employeeId && userId) {
+        location.href = REDIRECT_AFTER_LOGIN;
       }
     })();
+
+    /******** LOGIN ********/
+    async function login(){
+      const username = $('#username').value.trim();
+      const password = $('#password').value;
+      if (!username || !password){ notify('error','กรอก Username/Password ให้ครบ'); return; }
+      if (!lineUserId){ notify('error','ต้องเปิดผ่าน LINE (LIFF) เพื่อผูกอุปกรณ์'); return; }
+
+      try{
+        const res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ action:'login', username, password, lineUserId })
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || 'Login failed');
+
+        // ผูก session ฝั่ง client
+        localStorage.setItem('employeeId', json.employee.EmployeeID || '');
+        localStorage.setItem('name', json.employee.Name || '');
+        localStorage.setItem('userId', lineUserId);
+
+        if (json.needChange) {
+          openPwModal();
+        } else {
+          notify('success','เข้าสู่ระบบสำเร็จ กำลังพาไปหน้าหลัก...');
+          setTimeout(()=>location.href = REDIRECT_AFTER_LOGIN, 900);
+        }
+      }catch(err){
+        notify('error', String(err));
+      }
+    }
+
+    /******** CHANGE PASSWORD (ครั้งแรก) ********/
+    const pwModal = $('#pwModal');
+    const curPw = $('#curPw'), newPw = $('#newPw'), newPw2 = $('#newPw2');
+    const pwBar = $('#pwStrength'), pwMsg = $('#pwMsg');
+
+    function openPwModal(){
+      pwModal.style.display = 'grid';
+      curPw.value = newPw.value = newPw2.value = '';
+      pwBar.style.width = '0%';
+      pwMsg.textContent = '';
+    }
+    $('#btnCancelPw').addEventListener('click', ()=> pwModal.style.display='none');
+
+    function scorePassword(p){
+      let s=0; if(!p) return 0;
+      if(p.length>=8) s+=30; if(/[A-Z]/.test(p)) s+=20; if(/[a-z]/.test(p)) s+=20; if(/[0-9]/.test(p)) s+=20; if(/[^A-Za-z0-9]/.test(p)) s+=10;
+      return Math.min(s,100);
+    }
+    newPw.addEventListener('input', ()=>{
+      const sc=scorePassword(newPw.value); pwBar.style.width=sc+'%';
+      pwBar.style.background = sc>=80?'#10b981': sc>=50?'#f59e0b': '#ef4444';
+    });
+
+    async function doChangePassword(){
+      const username = $('#username').value.trim();
+      const currentPassword = curPw.value;
+      const np = newPw.value, np2 = newPw2.value;
+
+      if(!currentPassword || !np || !np2){ pwMsg.textContent='กรอกให้ครบทุกช่อง'; return; }
+      if(np!==np2){ pwMsg.textContent='รหัสผ่านใหม่ไม่ตรงกัน'; return; }
+      if(scorePassword(np)<50){ pwMsg.textContent='รหัสผ่านใหม่ไม่แข็งแรงพอ'; return; }
+
+      try{
+        const res = await fetch(API_URL, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ action:'change_password', username, currentPassword, newPassword: np, lineUserId })
+        });
+        const json = await res.json();
+        if(!json.ok) throw new Error(json.error || 'Change password failed');
+
+        pwMsg.textContent='เปลี่ยนรหัสผ่านสำเร็จ กำลังไปหน้าหลัก...';
+        setTimeout(()=> location.href = REDIRECT_AFTER_LOGIN, 800);
+      }catch(err){
+        pwMsg.textContent = String(err);
+      }
+    }
+
+    /******** EVENTS ********/
+    $('#btnLogin').addEventListener('click', login);
+    $('#btnChangePw').addEventListener('click', doChangePassword);
+    $('#btnReloadLine').addEventListener('click', ()=>{
+      if (!LIFF_ID) return notify('error','ยังไม่ได้ตั้งค่า LIFF_ID');
+      if (liff.isLoggedIn()) location.reload(); else liff.login();
+    });
+
+    /******** INIT ********/
+    (async function init(){ await initLIFF(); })();
   </script>
 </body>
 </html>
