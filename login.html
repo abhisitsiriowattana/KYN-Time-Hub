@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KYN Time – Login</title>
+  <title>KYN Time Hub – Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
@@ -48,7 +48,7 @@
     <div class="head">
       <div class="logo">KYN</div>
       <div>
-        <div class="title">KYN Time – Login</div>
+        <div class="title">KYN Time Hub – Login</div>
         <div class="sub">เข้าสู่ระบบด้วย Username/Password และผูก LINE เครื่องปัจจุบัน</div>
       </div>
     </div>
@@ -77,7 +77,7 @@
 
     <div class="foot">
       <div>© KYN Time Hub</div>
-      <div>Secure • SHA-256 • Device Binding</div>
+      <div>Secure • By G๐LF • Abh1s1t G. Siri๐</div>
     </div>
   </div>
 
@@ -169,9 +169,9 @@
           body: JSON.stringify({ action:'login', username, password, lineUserId })
         });
         const json = await res.json();
+        // console.log('LOGIN RESP:', json);
         if (!json.ok) throw new Error(json.error || 'Login failed');
 
-        // ผูก session ฝั่ง client
         localStorage.setItem('employeeId', json.employee.EmployeeID || '');
         localStorage.setItem('name', json.employee.Name || '');
         localStorage.setItem('userId', lineUserId);
@@ -236,9 +236,9 @@
     }
 
     /******** EVENTS ********/
-    $('#btnLogin').addEventListener('click', login);
-    $('#btnChangePw').addEventListener('click', doChangePassword);
-    $('#btnReloadLine').addEventListener('click', ()=>{
+    document.getElementById('btnLogin').addEventListener('click', login);
+    document.getElementById('btnChangePw').addEventListener('click', doChangePassword);
+    document.getElementById('btnReloadLine').addEventListener('click', ()=>{
       if (!LIFF_ID) return notify('error','ยังไม่ได้ตั้งค่า LIFF_ID');
       if (liff.isLoggedIn()) location.reload(); else liff.login();
     });
