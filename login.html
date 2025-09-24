@@ -14,18 +14,15 @@
 
   <style>
     :root{
-      /* สีหลัก (รองรับ Light/Dark) */
       --brand:#ff7a1a;
-      --bg:#0b1220;           /* dark */
+      --bg:#0b1220;
       --bg-card:#0f172a;
       --line:#1f2937;
       --fg:#e5e7eb;
       --fg-muted:#9fb0c8;
       --ok:#10b981; --err:#ef4444;
       --radius:16px;
-      --tap:14px;            /* target padding for touch */
-
-      /* iOS safe-area */
+      --tap:14px;
       --safe-top: env(safe-area-inset-top);
       --safe-bottom: env(safe-area-inset-bottom);
     }
@@ -39,7 +36,6 @@
       }
     }
 
-    /* Reset & base */
     *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
     html,body{height:100%}
     body{
@@ -55,13 +51,7 @@
       padding-bottom: max(var(--safe-bottom), 12px);
     }
 
-    /* App container */
-    .shell{
-      width:min(720px, 94vw);
-      display:grid; gap:14px;
-    }
-
-    /* Card */
+    .shell{ width:min(720px, 94vw); display:grid; gap:14px; }
     .card{
       background:var(--bg-card);
       border:1px solid var(--line);
@@ -70,7 +60,6 @@
       overflow:hidden;
     }
 
-    /* Header */
     .head{
       padding:18px 18px;
       border-bottom:1px solid var(--line);
@@ -94,11 +83,10 @@
     .title{margin:0; font-weight:800; font-size:clamp(18px, 2.6vw, 22px)}
     .sub{margin:2px 0 0; color:var(--fg-muted); font-size:clamp(12px, 2.2vw, 13px)}
 
-    /* Body */
     .body{padding:18px; display:grid; gap:14px}
     label{font-size:13px; color:color-mix(in oklab, var(--fg) 85%, var(--fg-muted)); margin-bottom:6px; display:block}
     input{
-      width:100%; font-size:16px; /* iOS no zoom on focus */
+      width:100%; font-size:16px; /* iOS: no zoom */
       padding:12px 14px;
       background:color-mix(in oklab, var(--bg) 90%, black);
       color:var(--fg); border:1px solid #233045; border-radius:12px; outline:none;
@@ -110,8 +98,7 @@
       appearance:none; border:0; border-radius:12px;
       padding:12px 18px; font-weight:800; cursor:pointer;
       display:inline-flex; align-items:center; gap:10px;
-      min-height:44px; /* touch target guideline */
-      letter-spacing:.2px;
+      min-height:44px; letter-spacing:.2px;
     }
     .btn-primary{background:var(--brand); color:#111827}
     .btn-ghost{background:transparent; border:1px solid #263144; color:var(--fg)}
@@ -124,14 +111,12 @@
 
     .hint{font-size:12px; color:var(--fg-muted)}
 
-    /* Footer */
     .foot{
       padding:12px 18px; border-top:1px solid var(--line);
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
       color:var(--fg-muted); font-size:12px;
     }
 
-    /* Modal: Change Password */
     .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; place-items:center; padding:16px; z-index:50}
     .modal{
       width:min(520px, 92vw); background:var(--bg-card);
@@ -141,14 +126,12 @@
     .meter{height:6px; border-radius:999px; background:#1f2937; overflow:hidden}
     .meter>div{height:100%; background:var(--ok); width:0%}
 
-    /* Mobile-first: เพิ่มการจัดระยะบนจอเล็ก */
     @media (max-width:400px){
       .head{padding:16px}
       .body{padding:16px}
       .foot{padding:10px 16px}
     }
 
-    /* Mobile-only Gate: ซ่อนแอปเมื่อเป็น Desktop */
     .gate{display:none; text-align:center; max-width:560px; padding:22px; background:var(--bg-card); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.35)}
     .gate h2{margin:0 0 8px; font-size:18px}
     .gate p{margin:0; color:var(--fg-muted)}
@@ -163,11 +146,10 @@
   </div>
 
   <!-- App Shell -->
-  <div class="shell" id="appShell">
+  <div class="shell" id="appShell" style="display:none">
     <div class="card">
       <div class="head">
         <div class="logo">
-          <!-- เปลี่ยน src เป็นโลโก้บริษัทของคุณ -->
           <img
             src="https://kyn-floorthailand.com/wp-content/uploads/2022/04/logo.png"
             alt="KYN Logo" loading="lazy" decoding="async">
@@ -201,8 +183,8 @@
       </div>
 
       <div class="foot">
-        <div>© KYN Time Hub</div>
-        <div>Secure • SHA-256 • Device Binding</div>
+        <div>©KYN Time Hub</div>
+        <div>Secure • G๐LF • by ABh1s1T G. S1r1๐</div>
       </div>
     </div>
   </div>
@@ -236,13 +218,12 @@
   <script>
     /******** CONFIG (แก้ให้ตรงระบบคุณ) ********/
     const API_URL = 'https://script.google.com/macros/s/AKfycbxCy7ExGaKLpPShFB_BcuZqqpbO0rpuUcAjKnHu0-LsFG-lahdtCmziKTmQMvf0TEN1Cg/exec'; // Apps Script Web App URL
-    const LIFF_ID  = '2007896777-Gq1RQ1oE';                                       // LIFF ID ของ LINE App
+    const LIFF_ID  = '2007896777-Gq1RQ1oE'; // LIFF ID ของ LINE App
     const params   = new URLSearchParams(location.search);
     const REDIRECT_AFTER_LOGIN = params.get('redirect') || 'index.html';
 
     /******** MOBILE-ONLY GATE ********/
-    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-                       .test(navigator.userAgent || '');
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
     (function mobileGate(){
       const app = document.getElementById('appShell');
       const gate = document.getElementById('desktopGate');
@@ -269,18 +250,18 @@
     /******** LIFF ********/
     async function initLIFF(){
       try{
-        $('#liffStatus').textContent = 'กำลังเริ่มต้น LIFF...';
+        document.getElementById('liffStatus').textContent = 'กำลังเริ่มต้น LIFF...';
         await liff.init({ liffId: LIFF_ID });
         if (!liff.isLoggedIn()){
-          $('#liffStatus').textContent = 'ยังไม่ได้ล็อกอิน LINE – กด "เปิดผ่าน LINE อีกครั้ง"';
+          document.getElementById('liffStatus').textContent = 'ยังไม่ได้ล็อกอิน LINE – กด "เปิดผ่าน LINE อีกครั้ง"';
           return false;
         }
         const prof = await liff.getProfile();
         lineUserId = prof.userId;
-        $('#liffStatus').textContent = 'ตรวจสอบ LINE สำเร็จ (พร้อมผูกอุปกรณ์)';
+        document.getElementById('liffStatus').textContent = 'ตรวจสอบ LINE สำเร็จ (พร้อมผูกอุปกรณ์)';
         return true;
       }catch(err){
-        $('#liffStatus').textContent = 'ไม่สามารถเริ่ม LIFF ได้: ' + err;
+        document.getElementById('liffStatus').textContent = 'ไม่สามารถเริ่ม LIFF ได้: ' + err;
         return false;
       }
     }
@@ -302,7 +283,7 @@
       try{
         const res = await fetch(API_URL, {
           method:'POST',
-          headers:{'Content-Type':'application/json'},
+          headers:{ 'Content-Type':'text/plain;charset=utf-8' }, // สำคัญ: เลี่ยง preflight
           body: JSON.stringify({ action:'login', username, password, lineUserId })
         });
         const json = await res.json();
@@ -334,7 +315,7 @@
       pwBar.style.width = '0%';
       pwMsg.textContent = '';
     }
-    $('#btnCancelPw').addEventListener('click', ()=> pwModal.style.display='none');
+    document.getElementById('btnCancelPw').addEventListener('click', ()=> pwModal.style.display='none');
 
     function scorePassword(p){
       let s=0; if(!p) return 0;
@@ -358,7 +339,7 @@
       try{
         const res = await fetch(API_URL, {
           method:'POST',
-          headers:{'Content-Type':'application/json'},
+          headers:{ 'Content-Type':'text/plain;charset=utf-8' }, // สำคัญ: เลี่ยง preflight
           body: JSON.stringify({ action:'change_password', username, currentPassword, newPassword: np, lineUserId })
         });
         const json = await res.json();
@@ -376,11 +357,24 @@
     document.getElementById('btnChangePw').addEventListener('click', doChangePassword);
     document.getElementById('btnReloadLine').addEventListener('click', ()=>{
       if (!LIFF_ID) return notify('error','ยังไม่ได้ตั้งค่า LIFF_ID');
-      if (liff.isLoggedIn()) location.reload(); else liff.login();
+      try{
+        if (liff.isLoggedIn()) location.reload(); else liff.login();
+      }catch(e){
+        notify('error', 'LIFF ยังไม่พร้อม: ' + e);
+      }
     });
 
     /******** INIT ********/
-    (async function init(){ await initLIFF(); })();
+    (async function init(){
+      // แสดง UI เฉพาะมือถือ
+      const app = document.getElementById('appShell');
+      const gate = document.getElementById('desktopGate');
+      if (app && gate && app.classList.contains('hidden') === false) {
+        app.style.display = 'grid';
+        gate.classList.add('hidden');
+      }
+      await initLIFF();
+    })();
   </script>
 </body>
 </html>
