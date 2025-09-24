@@ -1,102 +1,228 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Mobile-first + Safe Area (iOS notch) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="color-scheme" content="dark light">
   <title>KYN Time Hub – Login</title>
+
+  <!-- System-friendly fonts (iOS/Android) -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>
-    :root{ --orange:#ff7a1a; --bg:#0b1220; --card:#0f172a; --line:#1f2937; --muted:#93a0b8; --err:#ef4444; --ok:#10b981; --radius:16px; }
-    *{box-sizing:border-box}
-    body{
-      margin:0; min-height:100dvh; display:grid; place-items:center;
-      background:
-        radial-gradient(900px 320px at 110% -15%, rgba(255,122,26,.18), transparent 60%),
-        linear-gradient(180deg,#0b1220,#111827);
-      color:#e5e7eb;
-      font-family:"Inter","Prompt",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
-    }
-    .card{width:min(720px,92vw); background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 12px 40px rgba(0,0,0,.45); overflow:hidden}
-    .head{padding:26px 28px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:center}
-    .logo{width:44px;height:44px;border-radius:12px;background:conic-gradient(from 240deg,#ffaf70,#ff7a1a,#ffaf70); display:grid; place-items:center; color:#111827; font-weight:800}
-    .title{margin:0; font-size:22px; font-weight:800}
-    .sub{margin:2px 0 0; color:#9fb0c8; font-size:13px}
-    .body{padding:20px 28px 22px; display:grid; gap:16px}
-    label{font-size:13px; color:#cbd5e1; display:block; margin:0 0 6px}
-    input{width:100%; padding:12px 12px; border-radius:12px; border:1px solid #233045; background:#0b1220; color:#e9eef7; outline:none}
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .btn{appearance:none; border:0; border-radius:12px; padding:12px 16px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:10px}
-    .btn-primary{background:var(--orange); color:#111827}
-    .btn-ghost{background:transparent; border:1px solid #263144; color:#cbd5e1}
-    .alert{padding:12px 14px; border-radius:12px; font-size:14px; display:none}
-    .alert.error{background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35); color:#ffd7d7}
-    .alert.success{background:rgba(16,185,129,.12); border:1px solid rgba(16,185,129,.35); color:#c7f7df}
-    .hint{font-size:12px; color:#9fb0c8}
-    .foot{padding:14px 28px 18px; border-top:1px solid var(--line); color:#8ea4bf; font-size:12px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap}
 
-    /* Modal เปลี่ยนรหัสผ่าน */
+  <style>
+    :root{
+      /* สีหลัก (รองรับ Light/Dark) */
+      --brand:#ff7a1a;
+      --bg:#0b1220;           /* dark */
+      --bg-card:#0f172a;
+      --line:#1f2937;
+      --fg:#e5e7eb;
+      --fg-muted:#9fb0c8;
+      --ok:#10b981; --err:#ef4444;
+      --radius:16px;
+      --tap:14px;            /* target padding for touch */
+
+      /* iOS safe-area */
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --bg-card:#ffffff;
+        --line:#e5e7eb;
+        --fg:#0f172a;
+        --fg-muted:#546179;
+      }
+    }
+
+    /* Reset & base */
+    *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+    html,body{height:100%}
+    body{
+      margin:0; padding:0;
+      background:
+        radial-gradient(900px 320px at 110% -15%, color-mix(in oklab, var(--brand) 20%, transparent), transparent),
+        linear-gradient(180deg,var(--bg),color-mix(in oklab, var(--bg) 90%, black));
+      color:var(--fg);
+      font-family: "Inter","Prompt", ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, "Noto Sans Thai", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+      display:grid; place-items:center;
+      padding-top: max(var(--safe-top), 12px);
+      padding-bottom: max(var(--safe-bottom), 12px);
+    }
+
+    /* App container */
+    .shell{
+      width:min(720px, 94vw);
+      display:grid; gap:14px;
+    }
+
+    /* Card */
+    .card{
+      background:var(--bg-card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+
+    /* Header */
+    .head{
+      padding:18px 18px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; gap:12px;
+      background:
+        radial-gradient(1000px 280px at 10% -30%, color-mix(in oklab, var(--brand) 18%, transparent), transparent),
+        radial-gradient(800px 240px at 120% -50%, color-mix(in oklab, var(--brand) 12%, transparent), transparent);
+    }
+    .logo{
+      width:56px; height:56px; flex:0 0 56px;
+      border-radius:12px; overflow:hidden;
+      background:transparent;
+      border:1px solid color-mix(in oklab, var(--line) 70%, transparent);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 3px 12px rgba(0,0,0,.25);
+    }
+    .logo img{
+      width:100%; height:100%; object-fit:contain;
+      image-rendering:-webkit-optimize-contrast; image-rendering:crisp-edges;
+    }
+    .title{margin:0; font-weight:800; font-size:clamp(18px, 2.6vw, 22px)}
+    .sub{margin:2px 0 0; color:var(--fg-muted); font-size:clamp(12px, 2.2vw, 13px)}
+
+    /* Body */
+    .body{padding:18px; display:grid; gap:14px}
+    label{font-size:13px; color:color-mix(in oklab, var(--fg) 85%, var(--fg-muted)); margin-bottom:6px; display:block}
+    input{
+      width:100%; font-size:16px; /* iOS no zoom on focus */
+      padding:12px 14px;
+      background:color-mix(in oklab, var(--bg) 90%, black);
+      color:var(--fg); border:1px solid #233045; border-radius:12px; outline:none;
+    }
+    input::placeholder{color:color-mix(in oklab, var(--fg-muted) 70%, transparent)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+    .btn{
+      appearance:none; border:0; border-radius:12px;
+      padding:12px 18px; font-weight:800; cursor:pointer;
+      display:inline-flex; align-items:center; gap:10px;
+      min-height:44px; /* touch target guideline */
+      letter-spacing:.2px;
+    }
+    .btn-primary{background:var(--brand); color:#111827}
+    .btn-ghost{background:transparent; border:1px solid #263144; color:var(--fg)}
+    .btn:active{transform:translateY(1px)}
+    .btn[disabled]{opacity:.6; pointer-events:none}
+
+    .alert{padding:12px 14px; border-radius:12px; font-size:14px; display:none}
+    .alert.error{background:color-mix(in oklab, var(--err) 18%, transparent); border:1px solid color-mix(in oklab, var(--err) 45%, transparent); color:#ffd7d7}
+    .alert.success{background:color-mix(in oklab, var(--ok) 18%, transparent); border:1px solid color-mix(in oklab, var(--ok) 45%, transparent); color:#c7f7df}
+
+    .hint{font-size:12px; color:var(--fg-muted)}
+
+    /* Footer */
+    .foot{
+      padding:12px 18px; border-top:1px solid var(--line);
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      color:var(--fg-muted); font-size:12px;
+    }
+
+    /* Modal: Change Password */
     .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; place-items:center; padding:16px; z-index:50}
-    .modal{width:min(520px,92vw); background:#0f172a; border:1px solid #263144; border-radius:16px; padding:18px; color:#e5e7eb}
+    .modal{
+      width:min(520px, 92vw); background:var(--bg-card);
+      border:1px solid #263144; border-radius:16px; padding:18px; color:var(--fg)
+    }
     .modal h3{margin:0 0 8px; font-size:18px}
     .meter{height:6px; border-radius:999px; background:#1f2937; overflow:hidden}
-    .meter>div{height:100%; background:#10b981; width:0%}
+    .meter>div{height:100%; background:var(--ok); width:0%}
+
+    /* Mobile-first: เพิ่มการจัดระยะบนจอเล็ก */
+    @media (max-width:400px){
+      .head{padding:16px}
+      .body{padding:16px}
+      .foot{padding:10px 16px}
+    }
+
+    /* Mobile-only Gate: ซ่อนแอปเมื่อเป็น Desktop */
+    .gate{display:none; text-align:center; max-width:560px; padding:22px; background:var(--bg-card); border:1px solid var(--line); border-radius:16px; box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    .gate h2{margin:0 0 8px; font-size:18px}
+    .gate p{margin:0; color:var(--fg-muted)}
+    .hidden{display:none !important}
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="head">
-      <div class="logo">KYN</div>
-      <div>
-        <div class="title">KYN Time Hub – Login</div>
-        <div class="sub">เข้าสู่ระบบด้วย Username/Password และผูก LINE เครื่องปัจจุบัน</div>
-      </div>
-    </div>
+  <!-- Mobile-only gate (จะแสดงถ้าไม่ใช่มือถือ) -->
+  <div class="gate" id="desktopGate">
+    <h2>เปิดใช้งานบนมือถือเท่านั้น</h2>
+    <p>โปรดสแกน QR หรือเปิดลิงก์นี้ใน LINE บนสมาร์ตโฟนของคุณ</p>
+  </div>
 
-    <div class="body">
-      <div id="alert" class="alert"></div>
-
-      <div class="hint" id="liffStatus">กำลังตรวจสอบ LINE (เพื่อผูกอุปกรณ์)...</div>
-
-      <div>
-        <label>Username</label>
-        <input id="username" autocomplete="username" placeholder="เช่น e001" />
-      </div>
-      <div>
-        <label>Password</label>
-        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
-      </div>
-
-      <div class="row">
-        <button id="btnLogin" class="btn btn-primary">เข้าสู่ระบบ</button>
-        <button id="btnReloadLine" class="btn btn-ghost">เปิดผ่าน LINE อีกครั้ง</button>
+  <!-- App Shell -->
+  <div class="shell" id="appShell">
+    <div class="card">
+      <div class="head">
+        <div class="logo">
+          <!-- เปลี่ยน src เป็นโลโก้บริษัทของคุณ -->
+          <img
+            src="https://kyn-floorthailand.com/wp-content/uploads/2022/04/logo.png"
+            alt="KYN Logo" loading="lazy" decoding="async">
+        </div>
+        <div>
+          <h1 class="title">KYN Time Hub – Login</h1>
+          <p class="sub">เข้าสู่ระบบด้วย Username/Password และผูก LINE เครื่องปัจจุบัน</p>
+        </div>
       </div>
 
-      <div class="hint">หมายเหตุ: ต้องเปิดหน้านี้ผ่าน LINE (LIFF) เพื่อผูกบัญชีเข้ากับเครื่อง</div>
-    </div>
+      <div class="body">
+        <div id="alert" class="alert"></div>
 
-    <div class="foot">
-      <div>© KYN Time Hub</div>
-      <div>Secure • By G๐LF • Abh1s1t G. Siri๐</div>
+        <p class="hint" id="liffStatus">กำลังตรวจสอบ LINE (เพื่อผูกอุปกรณ์)...</p>
+
+        <div>
+          <label for="username">Username</label>
+          <input id="username" inputmode="text" autocomplete="username" placeholder="เช่น e001" />
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" type="password" inputmode="text" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+
+        <div class="row" style="margin-top:4px">
+          <button id="btnLogin" class="btn btn-primary">เข้าสู่ระบบ</button>
+          <button id="btnReloadLine" class="btn btn-ghost">เปิดผ่าน LINE อีกครั้ง</button>
+        </div>
+
+        <p class="hint">หมายเหตุ: ต้องเปิดหน้านี้ผ่าน LINE (LIFF) เพื่อผูกบัญชีเข้ากับเครื่อง</p>
+      </div>
+
+      <div class="foot">
+        <div>© KYN Time Hub</div>
+        <div>Secure • SHA-256 • Device Binding</div>
+      </div>
     </div>
   </div>
 
   <!-- Modal: บังคับเปลี่ยนรหัสผ่านครั้งแรก -->
-  <div id="pwModal" class="backdrop">
+  <div id="pwModal" class="backdrop" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
     <div class="modal">
-      <h3>เปลี่ยนรหัสผ่านครั้งแรก</h3>
+      <h3 id="pwTitle">เปลี่ยนรหัสผ่านครั้งแรก</h3>
       <p class="hint" style="margin:-2px 0 10px">ตั้งรหัสอย่างน้อย 8 ตัวอักษร และมี ตัวพิมพ์ใหญ่/เล็ก และตัวเลข</p>
       <div>
-        <label>รหัสผ่านปัจจุบัน</label>
+        <label for="curPw">รหัสผ่านปัจจุบัน</label>
         <input id="curPw" type="password" placeholder="••••••••" />
       </div>
       <div>
-        <label>รหัสผ่านใหม่</label>
+        <label for="newPw">รหัสผ่านใหม่</label>
         <input id="newPw" type="password" placeholder="อย่างน้อย 8 ตัวอักษร" />
         <div class="meter" style="margin-top:8px"><div id="pwStrength"></div></div>
       </div>
       <div>
-        <label>ยืนยันรหัสผ่านใหม่</label>
+        <label for="newPw2">ยืนยันรหัสผ่านใหม่</label>
         <input id="newPw2" type="password" placeholder="พิมพ์ซ้ำอีกครั้ง" />
       </div>
       <div class="row" style="margin-top:10px">
@@ -109,15 +235,28 @@
 
   <script>
     /******** CONFIG (แก้ให้ตรงระบบคุณ) ********/
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxCy7ExGaKLpPShFB_BcuZqqpbO0rpuUcAjKnHu0-LsFG-lahdtCmziKTmQMvf0TEN1Cg/exec'; // TODO: Apps Script Web App URL
-    const LIFF_ID = '2007896777-Gq1RQ1oE'; // TODO: LIFF ID ของ LINE App
-    const params = new URLSearchParams(location.search);
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxCy7ExGaKLpPShFB_BcuZqqpbO0rpuUcAjKnHu0-LsFG-lahdtCmziKTmQMvf0TEN1Cg/exec'; // Apps Script Web App URL
+    const LIFF_ID  = '2007896777-Gq1RQ1oE';                                       // LIFF ID ของ LINE App
+    const params   = new URLSearchParams(location.search);
     const REDIRECT_AFTER_LOGIN = params.get('redirect') || 'index.html';
 
-    /******** STATE ********/
-    let lineUserId = '';
+    /******** MOBILE-ONLY GATE ********/
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+                       .test(navigator.userAgent || '');
+    (function mobileGate(){
+      const app = document.getElementById('appShell');
+      const gate = document.getElementById('desktopGate');
+      if (!isMobileUA) {
+        app.classList.add('hidden');
+        gate.style.display = 'block';
+      } else {
+        gate.classList.add('hidden');
+        app.style.display = 'grid';
+      }
+    })();
 
-    /******** UI ********/
+    /******** STATE & UI ********/
+    let lineUserId = '';
     const $ = (s)=>document.querySelector(s);
     const alertBox = $('#alert');
     function notify(type, text){
@@ -146,13 +285,11 @@
       }
     }
 
-    /******** FAST CONTINUE: ข้ามหน้าถ้ามี session แล้ว ********/
+    /******** FAST CONTINUE ********/
     (function fastContinue(){
       const employeeId = localStorage.getItem('employeeId');
       const userId = localStorage.getItem('userId');
-      if (employeeId && userId) {
-        location.href = REDIRECT_AFTER_LOGIN;
-      }
+      if (employeeId && userId) location.href = REDIRECT_AFTER_LOGIN;
     })();
 
     /******** LOGIN ********/
@@ -169,7 +306,6 @@
           body: JSON.stringify({ action:'login', username, password, lineUserId })
         });
         const json = await res.json();
-        // console.log('LOGIN RESP:', json);
         if (!json.ok) throw new Error(json.error || 'Login failed');
 
         localStorage.setItem('employeeId', json.employee.EmployeeID || '');
